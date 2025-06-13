@@ -3,47 +3,22 @@ const ObjectId = require('mongodb').ObjectId;
 const { validationResult } = require('express-validator');
 
 const getAll = async (req, res) => {
+    //#swagger.tags=['Contacts']
     try {
-      const games = await mongodb
+      const merchandise = await mongodb
         .getDatabase()
         .db()
-        .collection('games')
+        .collection('merchandise')
         .find()
         .toArray();
   
       res.setHeader('Content-Type', 'application/json');
-      res.status(200).json(games);
+      res.status(200).json(merchandise);
     } catch (err) {
-      res.status(500).json({ message: err.message || 'Failed to retrieve games.' });
+      res.status(500).json({ message: err.message || 'Failed to retrieve merchandise.' });
     }
   };
   const getSingle = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
-    }
-  
-    try {
-      const userId = new ObjectId(req.params.id);
-      const game = await mongodb
-        .getDatabase()
-        .db()
-        .collection('games')
-        .findOne({ _id: userId });
-  
-      if (!game) {
-        return res.status(404).json({ message: 'Game not found' });
-      }
-  
-      res.setHeader('Content-Type', 'application/json');
-      res.status(200).json(game);
-    } catch (err) {
-      res.status(500).json({ message: err.message || 'Failed to fetch game' });
-    }
-  };
-  
-  // Create a new character
-  const createGame = async (req, res) => {
     //#swagger.tags=['Contacts']
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -51,19 +26,45 @@ const getAll = async (req, res) => {
     }
   
     try {
-      const newGame = {
+      const userId = new ObjectId(req.params.id);
+      const merchandise = await mongodb
+        .getDatabase()
+        .db()
+        .collection('merchandise')
+        .findOne({ _id: userId });
+  
+      if (!merchandise) {
+        return res.status(404).json({ message: 'merchandise not found' });
+      }
+  
+      res.setHeader('Content-Type', 'application/json');
+      res.status(200).json(merchandise);
+    } catch (err) {
+      res.status(500).json({ message: err.message || 'Failed to fetch merchandise' });
+    }
+  };
+  
+  // Create a new merchandise
+  const createMerch = async (req, res) => {
+    //#swagger.tags=['Contacts']
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+  
+    try {
+      const newMerch = {
         name: req.body.name,
-        genre: req.body.genre,
-        releaseYear: req.body.releaseYear,
-        metacriticScore: req.body.metacriticScore,
+        merchType: req.body.merchType,
+        source: req.body.source,
         inventory: req.body.inventory
       };
   
       const response = await mongodb
         .getDatabase()
         .db()
-        .collection('games')
-        .insertOne(newGame);
+        .collection('merchandise')
+        .insertOne(newMerch);
   
       if (response.acknowledged) {
         res.status(201).send();
@@ -71,12 +72,12 @@ const getAll = async (req, res) => {
         throw new Error('Insert not acknowledged');
       }
     } catch (err) {
-      res.status(500).json({ message: err.message || 'Failed to create game' });
+      res.status(500).json({ message: err.message || 'Failed to create merchandise' });
     }
   };
   
-  // Update a game
-  const updateGame = async (req, res) => {
+  // Update a merchandise
+  const updateMerch = async (req, res) => {
     //#swagger.tags=['Contacts']
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -85,32 +86,31 @@ const getAll = async (req, res) => {
   
     try {
       const userId = new ObjectId(req.params.id);
-      const game = {
+      const merchandise = {
         name: req.body.name,
-        genre: req.body.genre,
-        releaseYear: req.body.releaseYear,
-        metacriticScore: req.body.metacriticScore,
+        merchType: req.body.merchType,
+        source: req.body.source,
         inventory: req.body.inventory
       };
   
       const response = await mongodb
         .getDatabase()
         .db()
-        .collection('games')
-        .replaceOne({ _id: userId }, game);
+        .collection('merchandise')
+        .replaceOne({ _id: userId }, merchandise);
   
       if (response.modifiedCount > 0) {
         res.status(204).send();
       } else {
-        throw new Error('Game not updated');
+        throw new Error('merchandise not updated');
       }
     } catch (err) {
-      res.status(500).json({ message: err.message || 'Failed to update game' });
+      res.status(500).json({ message: err.message || 'Failed to update merchandise' });
     }
   };
   
-  // Delete a game
-  const deleteGame = async (req, res) => {
+  // Delete a merchandise
+  const deleteMerch = async (req, res) => {
     //#swagger.tags=['Contacts']
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -122,17 +122,17 @@ const getAll = async (req, res) => {
       const response = await mongodb
         .getDatabase()
         .db()
-        .collection('games')
+        .collection('merchandise')
         .deleteOne({ _id: userId });
   
       if (response.deletedCount > 0) {
         res.status(204).send();
       } else {
-        throw new Error('Game not deleted');
+        throw new Error('merchandise not deleted');
       }
     } catch (err) {
-      res.status(500).json({ message: err.message || 'Failed to delete game' });
+      res.status(500).json({ message: err.message || 'Failed to delete merchandise' });
     }
   };
 
-module.exports = { getAll, getSingle, createGame, updateGame, deleteGame };
+module.exports = { getAll, getSingle, createMerch, updateMerch, deleteMerch };

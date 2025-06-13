@@ -9,6 +9,8 @@ router.get('/welcome', (req, res) => {
 });
 router.use('/games', require('./games'));
 router.use('/consoles', require('./consoles'))
+router.use('/accessories', require('./accessories'))
+router.use('/merchandise', require('./merchandise'))
 
 router.get('/login', passport.authenticate('github'), (req, res) => {});
 
